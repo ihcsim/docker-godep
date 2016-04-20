@@ -9,14 +9,32 @@ Docker image to run Godep.
 ### Usage
 
 * To pull: `docker pull isim/godep`
+* To build: `docker build --rm -t isim/godep .`
 * To run: `docker run --rm isim/godep [<godep_command>]`
+
+To run `godep save` on a Linux host:
+```sh
+$ cd $YOUR_PACKAGE
+$ go get -u ./...
+$ docker run --rm -v $GOPATH:/go -w $YOUR_PACKAGE isim/godep save ./...
+```
+
+Otherwise on Mac OSX, perform `go get -u ./...` inside the godep container before running `godep save ./...`:
+```sh
+$ docker run --rm \
+  -v `pwd`:/go/src/$YOUR_PACKAGE \
+  -w /go/src/$YOUR_PACKAGE \
+  -it --entrypoint=/bin/bash \
+  isim/godep
+root@159878b11651:/go/src/$YOUR_PACKAGE# go get -u ./...
+root@159878b11651:/go/src/$YOUR_PACKAGE# godep save ./...
+```
 
 ### Sample Build Script
 
 This is a sample script to run `godep go build -v` inside the Docker container. Notice that by setting `godep` as the container entrypoint, it automatically picks up all the dependencies in `godep pwd`.
 
 To run: `$./gobuild-sample.sh <package>`
-
 ```sh
 #!/bin/bash
 
